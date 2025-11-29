@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: hanjuhn/backend:latest
+        image: hanjuhn/backend:v0
         env:
         - name: BADWORD_FN
           value: badword-filter
