@@ -26,7 +26,6 @@ def get_db():
     return sqlite3.connect(DB_PATH)
 
 
-# 서버 시작 시 DB 보장
 init_db()
 
 
@@ -49,6 +48,18 @@ def create_post(data: dict):
     conn.commit()
     conn.close()
     return {"result": "ok"}
+
+
+@app.put("/api/posts/{post_id}")
+def update_post(post_id: int, data: dict):
+    conn = get_db()
+    conn.execute(
+        "UPDATE posts SET text = ? WHERE id = ?",
+        (data["text"], post_id)
+    )
+    conn.commit()
+    conn.close()
+    return {"result": "updated"}
 
 
 @app.delete("/api/posts/{post_id}")

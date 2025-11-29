@@ -4,6 +4,8 @@ import axios from "axios"
 function App() {
   const [posts, setPosts] = useState([])
   const [text, setText] = useState("")
+  const [editingId, setEditingId] = useState(null)        // 수정 중인 게시글 ID
+  const [editingText, setEditingText] = useState("")      // 수정 텍스트
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -60,6 +62,30 @@ function App() {
     }
   }
 
+  // 수정 모드 진입
+  const handleEdit = (id, currentText) => {
+    setEditingId(id)
+    setEditingText(currentText)
+  }
+
+  // 수정 요청
+  const handleUpdate = async () => {
+    if (!editingText.trim()) return
+    try {
+      setLoading(true)
+      setError("")
+      await axios.put(`/api/posts/${editingId}`, { text: editingText })
+      setEditingId(null)
+      setEditingText("")
+      await fetchPosts()
+    } catch (e) {
+      console.error(e)
+      setError("게시글을 수정하지 못했습니다")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div
       style={{
@@ -71,6 +97,7 @@ function App() {
     >
       <h1 style={{ fontSize: "24px", marginBottom: "16px" }}>간단 게시판</h1>
 
+      {/* 작성 폼 */}
       <form onSubmit={handleCreate} style={{ marginBottom: "16px" }}>
         <textarea
           value={text}
@@ -109,24 +136,60 @@ function App() {
               border: "1px solid #ddd",
               borderRadius: "4px",
               padding: "8px",
-              marginBottom: "8px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center"
+              marginBottom: "8px"
             }}
           >
-            <span>{p.text}</span>
-            <button
-              onClick={() => handleDelete(p.id)}
-              disabled={loading}
-              style={{
-                marginLeft: "8px",
-                padding: "4px 8px",
-                cursor: loading ? "not-allowed" : "pointer"
-              }}
-            >
-              삭제
-            </button>
+            {editingId === p.id ? (
+              <>
+                {/* 수정 UI */}
+                <textarea
+                  value={editingText}
+                  onChange={(e) => setEditingText(e.target.value)}
+                  rows={3}
+                  style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+                />
+                <button
+                  onClick={handleUpdate}
+                  disabled={loading}
+                  style={{ marginTop: "8px", padding: "4px 8px" }}
+                >
+                  저장
+                </button>
+                <button
+                  onClick={() => setEditingId(null)}
+                  style={{ marginLeft: "8px", padding: "4px 8px" }}
+                >
+                  취소
+                </button>
+              </>
+            ) : (
+              <>
+                {/* 일반 UI */}
+                <span>{p.text}</span>
+                <div style={{ float: "right" }}>
+                  <button
+                    onClick={() => handleEdit(p.id, p.text)}
+                    disabled={loading}
+                    style={{
+                      marginLeft: "8px",
+                      padding: "4px 8px"
+                    }}
+                  >
+                    수정
+                  </button>
+                  <button
+                    onClick={() => handleDelete(p.id)}
+                    disabled={loading}
+                    style={{
+                      marginLeft: "8px",
+                      padding: "4px 8px"
+                    }}
+                  >
+                    삭제
+                  </button>
+                </div>
+              </>
+            )}
           </li>
         ))}
       </ul>
