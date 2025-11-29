@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: hanjuhn/frontend:latest
+        image: hanjuhn/frontend:
         ports:
         - containerPort: 80
