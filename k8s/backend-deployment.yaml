@@ -14,7 +14,11 @@ spec:
     spec:
       containers:
       - name: backend
+<<<<<<< HEAD
         image: hanjuhn/backend:backend-v1
+=======
+        image: hanjuhn/backend:0
+>>>>>>> f1e6066 (add version file + reset image tags)
         env:
         - name: BADWORD_FN
           value: badword-filter
